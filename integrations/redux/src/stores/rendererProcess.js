@@ -36,7 +36,7 @@ export const defaultState = {
     streams: [
         {
             'id': '000000',
-            'url': 'https://storage.googleapis.com/shaka-demo-assets/angel-one-widevine/dash.mpd',
+            'url': 'https://d71nzo856dokb.cloudfront.net/13c07eaa24bb52f651bc1de9d2ec4950cec4227f944319aa/13c07eaa24bb52f651bc1de9d2ec4950cec4227f944319aa.mpd',
             'type': 'DASH',
             'created': false,
             'downloading': false,
@@ -44,16 +44,8 @@ export const defaultState = {
         },
         {
             'id': '000001',
-            'url': 'https://storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd',
+            'url': 'https://d71nzo856dokb.cloudfront.net/0fe647f287ee86731b2c1981058ee5e57b1d4f7a58487447/0fe647f287ee86731b2c1981058ee5e57b1d4f7a58487447.mpd',
             'type': 'DASH',
-            'created': false,
-            'downloading': false,
-            'downloaded': false
-        },
-        {
-            'id': '000002',
-            'url': 'http://playready.directtaps.net/smoothstreaming/SSWSS720H264/SuperSpeedway_720.ism/Manifest',
-            'type': 'SmoothStreaming',
             'created': false,
             'downloading': false,
             'downloaded': false
