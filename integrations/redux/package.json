@@ -15,7 +15,6 @@
     "concurrently": "^4.1.1",
     "electron": "git+https://github.com/castlabs/electron-releases.git#v9.4.4-wvvmp",
     "electron-builder": "^21.2.0",
-    "electron-devtools-installer": "^2.2.4",
     "typescript": "^3.5.3",
     "wait-on": "^3.3.0"
   },
@@ -29,7 +28,8 @@
     "react-scripts": "3.1.0",
     "redux": "^4.0.4",
     "redux-thunk": "^2.3.0",
-    "shaka-player": "^2.5.4"
+    "shaka-player": "^2.5.4",
+    "electron-devtools-installer": "^2.2.4"
   },
   "scripts": {
     "start": "rescripts start",

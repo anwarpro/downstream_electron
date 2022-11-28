@@ -10,6 +10,7 @@ let downstreamInstance;
 const downstreamElectron = require('downstream-electron');
 // initialize main process redux store
 require('./mainProcess');
+const {default: installExtension, REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} = require("electron-devtools-installer");
 
 
 function createWindow() {
@@ -34,23 +35,21 @@ function createWindow() {
     });
 
     mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`);
-    if (isDev) {
-        const {
-            default: installExtension,
-            REACT_DEVELOPER_TOOLS,
-            REDUX_DEVTOOLS
-        } = require('electron-devtools-installer');
+    const {
+        default: installExtension,
+        REACT_DEVELOPER_TOOLS,
+        REDUX_DEVTOOLS
+    } = require('electron-devtools-installer');
 
-        installExtension(REACT_DEVELOPER_TOOLS)
-            .then((name) => console.log(`Added Extension: ${name}`))
-            .catch((err) => console.log('An error occurred: ', err));
+    installExtension(REACT_DEVELOPER_TOOLS)
+        .then((name) => console.log(`Added Extension: ${name}`))
+        .catch((err) => console.log('An error occurred: ', err));
 
-        installExtension(REDUX_DEVTOOLS)
-            .then((name) => console.log(`Added Extension: ${name}`))
-            .catch((err) => console.log('An error occurred: ', err));
+    installExtension(REDUX_DEVTOOLS)
+        .then((name) => console.log(`Added Extension: ${name}`))
+        .catch((err) => console.log('An error occurred: ', err));
 
-        mainWindow.webContents.openDevTools();
-    }
+    mainWindow.webContents.openDevTools();
 
     mainWindow.on('closed', () => mainWindow = null);
 }

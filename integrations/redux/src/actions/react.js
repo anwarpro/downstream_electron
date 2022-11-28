@@ -4,6 +4,9 @@
  *
  */
 
+const path = require('electron').remote.app.getAppPath()
+const isDev = require('electron-is-dev');
+
 /**
  *
  * @param {*} url
@@ -50,7 +53,8 @@ function playVideo(link) {
         }
     });
 
-    playerWindow.loadURL('http://localhost:3000/player/index.html');
+    // playerWindow.loadURL(isDev ? 'http://localhost:3000/player/index.html' : "");
+    playerWindow.loadURL(`file://${path}/build/player/index.html`);
     playerWindow.webContents.openDevTools();
     playerWindow.webContents.on('did-finish-load', function (evt, args) {
         playerWindow.webContents.send('startPlaybackStream', {
