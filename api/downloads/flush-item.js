@@ -30,17 +30,19 @@ FlushItem.prototype._saveToDisk = function (resolve, reject) {
   const path = appSettings.getSettings().settingsFolder + this.manifestId + "/";
   const file = "" + this.storageKey + ".json";
   const fileUrl = path + file;
-  mkdirp(path).then(function () {
-    let data = convertStorage(self.storageKey, self.items);
-    jsonfile.writeFile(fileUrl, data, function (err) {
-      if (!err) {
-        resolve();
-      } else {
-        reject(err);
-      }
-    });
-  }, function (error) {
-    reject(error);
+  mkdirp(path, function (err) {
+    if (err) {
+      reject(err);
+    } else {
+      let data = convertStorage(self.storageKey, self.items);
+      jsonfile.writeFile(fileUrl, data, function (err) {
+        if (!err) {
+          resolve();
+        } else {
+          reject(err);
+        }
+      });
+    }
   });
 };
 

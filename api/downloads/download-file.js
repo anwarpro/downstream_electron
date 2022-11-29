@@ -125,7 +125,6 @@ DownloadFile.prototype._initChunk = function (chunkNumber) {
   options.maxDownloadInternetRetry = this._options.maxDownloadChunkInternetRetry;
   options.timeout = this._options.timeout;
   options.retryTimeout = this._options.retryTimeout;
-  options.useChunkedEncoding = this._options.useChunkedEncoding;
 
   const size = this.file_size;
   if (this._chunksNumber > 1) {
@@ -278,7 +277,6 @@ DownloadFile.prototype.start = function () {
   }
 
   let req = net.request(req_options);
-  req.chunkedEncoding = this._options.useChunkedEncoding;
 
   req.on('response', (response) => {
     if (response && response.statusCode >= 400) {

@@ -2,6 +2,10 @@
 "use strict";
 const _ = require('underscore');
 const Snowflake = require("./util/snowflake-id");
+const electron = require('electron');
+const electronRemote = process.type === 'browser'
+  ? electron
+  : require('@electron/remote');
 
 const appSettings = require('./app-settings');
 const beMethods = require('./be-methods-all');
@@ -211,7 +215,7 @@ DownstreamElectronBE.prototype._onApiRequest = function (evt, data, target) {
  */
 DownstreamElectronBE.prototype._send = function (response, target) {
   try {
-    const windows = require('electron').BrowserWindow.getAllWindows();
+    const windows = electronRemote.BrowserWindow.getAllWindows();
     for (let i = 0, j = windows.length; i < j; i++) {
       if (windows[i].id === target) {
         windows[i].webContents.send('downstreamElectronFE', response);
@@ -232,7 +236,7 @@ DownstreamElectronBE.prototype._serveOfflineContent = function () {
   const maxOfflineContentPortRange = appSettings.getSettings().maxOfflineContentPortRange;
 
   this.server = new Server(this.offlineController, this.downloadsController, maxOfflineContentPortRange, this._offlineContentPort);
-  this.server.serveOfflineContent(function (offlinePort) {
+  this.server.serveOfflineContent( function (offlinePort) {
     self._offlineContentPort = offlinePort;
   })
 

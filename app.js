@@ -1,4 +1,12 @@
-const { BrowserWindow, app } = require('electron');
+const electron = require('electron');
+const FlakeId = require('flake-idgen');
+const remoteMain = require('@electron/remote/main');
+const electronRemote = process.type === 'browser'
+  ? electron
+  : require('@electron/remote');
+
+remoteMain.initialize();
+
 const fs = require('fs');
 
 // TESTING PRODUCTION
@@ -24,10 +32,8 @@ process.argv.forEach(function (val, index, array) {
 
 const exampleFile = `file://${__dirname}/examples/${example}/index.html`;
 const path = require('path');
-// default value of allowRendererProcessReuse false is deprecated
-app.allowRendererProcessReuse = true;
 
-function createWindow() {
+function createWindow () {
   // eslint-disable-next-line no-process-env
   let appDir = path.dirname(process.mainModule.filename) + '/';
   // head request parameter test
@@ -40,21 +46,21 @@ function createWindow() {
     useHeadRequests: useHeadRequest
   });
 
-  const win = new BrowserWindow({
+  const win = new electronRemote.BrowserWindow({
     width: 1200,
     height: 700,
     resizable: true,
     webPreferences: {
       plugins: true,
       nodeIntegration: true,
-      // NOTE: is disabled by default since Electron 9
-      enableRemoteModule: true,
+      contextIsolation: false,
       // NOTE: !WARNING! use with caution it allows app to download content
       //                 from any URL
       webSecurity: false
     }
   });
 
+  remoteMain.enable(win.webContents);
   win.loadURL(exampleFile);
   win.webContents.openDevTools();
 }
@@ -63,14 +69,14 @@ function onWillQuit() {
   downstreamInstance.stop();
 }
 
-app.on('ready', createWindow);
-app.on('will-quit', onWillQuit);
-app.on('window-all-closed', function () {
+electronRemote.app.on('ready', createWindow);
+electronRemote.app.on('will-quit', onWillQuit);
+electronRemote.app.on('window-all-closed', function () {
   console.log('window-all-closed');
-  app.quit();
+  electronRemote.app.quit();
 });
 
-app.on('widevine-ready', (version, lastVersion) => {
+electronRemote.app.on('widevine-ready', (version, lastVersion) => {
   if (null !== lastVersion) {
     console.log('Widevine ' + version + ', upgraded from ' + lastVersion + ', is ready to be used!');
   } else {
@@ -78,11 +84,11 @@ app.on('widevine-ready', (version, lastVersion) => {
   }
 });
 
-app.on('widevine-update-pending', (currentVersion, pendingVersion) => {
+electronRemote.app.on('widevine-update-pending', (currentVersion, pendingVersion) => {
   console.log('Widevine ' + currentVersion + ' is ready to be upgraded to ' + pendingVersion + '!');
 });
 
-app.on('widevine-error', (error) => {
+electronRemote.app.on('widevine-error', (error) => {
   console.log('Widevine installation encounterted an error: ' + error);
   process.exit(1)
 });

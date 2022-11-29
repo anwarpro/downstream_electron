@@ -96,24 +96,26 @@ downloadUtil.getDownloadLinks = function getDownloadLinks (manifestId, localPath
       if (index > -1) {
         localUrl = localUrl.substr(0, index);
       }
-      if ((!downloadedHash[localUrl]) || (!downloadedHash[localUrl] && downloadedHash[localUrl].remoteUrl !== remoteUrl)) {
-        if (!links[k]) {
-          links[k] = [];
-        }
 
-        links[k].push({
+      let fileParts = localUrl.split('/');
+      fileParts = fileParts.map((part) => decodeURIComponent(part));
+      localUrl = fileParts.join('/');
+
+      if ((!downloadedHash[localUrl]) || (!downloadedHash[localUrl] && downloadedHash[localUrl].remoteUrl !== remoteUrl)) {
+        links.push({
           id: id,
           bandwidth: bandwidth,
           contentType: contentType,
           remoteUrl: remoteUrl,
-          localUrl: localUrl
+          localUrl: localUrl,
+          index: k
         });
       }
     }
   }
-
-  // NOTE: use links.flat() in the future
-  return links.reduce((acc, val) => acc.concat(val), []);
+  // sort links in order to allow playback before all links are downloaded (for ex: to switch from audio tracks)
+  links.sort((a, b) => a.index - b.index);
+  return links;
 };
 
 /**

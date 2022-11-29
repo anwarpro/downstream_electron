@@ -1,5 +1,4 @@
 "use strict";
-const BASE64 = require('base64-js');
 const pssh = require("./pssh");
 const MPEG_DASH_PROTECTION_SCHEME_ID_URI = 'urn:mpeg:dash:mp4protection:2011';
 const WIDEVINE_SCHEME_ID_URI = 'urn:uuid:edef8ba9-79d6-4ace-a3c8-27dcd51d21ed';
@@ -49,8 +48,6 @@ const AdaptationSetNode = (function (_super) {
       if (schemeIdUri && schemeIdUri.value.toLowerCase() === MPEG_DASH_PROTECTION_SCHEME_ID_URI) {
         if (attrs.getNamedItem("cenc:default_KID")) {
           KID = attrs.getNamedItem("cenc:default_KID").value;
-          // Get KID (base64 decoded) as byte array
-          KID = BASE64.toByteArray(KID);
           break;
         }
       }
@@ -60,7 +57,7 @@ const AdaptationSetNode = (function (_super) {
       const attrs = contentProtections[i].attributes;
       if (attrs.getNamedItem("schemeIdUri")) {
         const scheme = attrs.getNamedItem("schemeIdUri").value.toLowerCase();
-        const cenc = contentProtections[i].getElementsByTagName("cenc:pssh");
+        const cenc = contentProtections[i].getElementsByTagNameNS("*", "pssh");
         if (cenc.length) {
           const contentProtection = {
             schemeIdUri: scheme,
@@ -68,7 +65,7 @@ const AdaptationSetNode = (function (_super) {
           };
           this.contentProtections.push(contentProtection);
         } else if (KID && scheme === WIDEVINE_SCHEME_ID_URI) {
-          const psshWV = pssh.createWidevinePssh(KID);
+          const psshWV = pssh.createWidevinePsshFromString(KID);
           const contentProtection = {
             schemeIdUri: scheme,
             cencPSSH: psshWV

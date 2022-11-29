@@ -56,7 +56,7 @@
     "babel-loader": "8.2.5",
     "babel-preset-env": "1.7.0",
     "clean-webpack-plugin": "4.0.0",
-    "electron": "git+https://github.com/castlabs/electron-releases.git#v9.4.4-wvvmp",
+    "electron": "git+https://github.com/castlabs/electron-releases#v21.0.1+wvcus",
     "eslint": "^6.8.0",
     "jasmine-node": "3.0.0",
     "jquery": "3.6.1",
@@ -68,6 +68,7 @@
     "webpack-cli": "^4.10.0"
   },
   "dependencies": {
+    "@electron/remote": "^2.0.8",
     "base64-js": "1.5.1",
     "biguint-format": "1.0.2",
     "cors": "2.8.5",

@@ -1,5 +1,23 @@
-"use strict";
-const BASE64 = require('base64-js');
+"use strict"
+const BASE64 = require('base64-js')
+
+function guidToBytes (guid) {
+    var bytes = [];
+    guid.split('-').map((number, index) => {
+        var bytesInChar = index < 3 ? number.match(/.{1,2}/g).reverse() :  number.match(/.{1,2}/g);
+        bytesInChar.map((byte) => {
+          bytes.push(parseInt(byte, 16));
+        })
+    });
+    return bytes;
+}
+
+function createWidevinePsshFromString (str) {
+
+  let uuid = guidToBytes(str);
+  return this.createWidevinePssh(uuid);
+}
+
 
 function createWidevinePssh (KID) {
   // Create Widevine CENC header (Protocol Buffer) with KID value
@@ -42,5 +60,6 @@ function createWidevinePssh (KID) {
 }
 
 module.exports = {
+  createWidevinePsshFromString: createWidevinePsshFromString,
   createWidevinePssh: createWidevinePssh
 }

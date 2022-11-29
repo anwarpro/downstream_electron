@@ -22,8 +22,7 @@ const RepresentationNode = (function (_super) {
   }
 
   RepresentationNode.prototype.createSegmentInformation = function () {
-    const presentationDuration = IsoDurationParser_1.IsoDurationParser.getDuration(
-        this.attributeList['mediaPresentationDuration']);
+    const presentationDuration = this.attributeList['durationInS'];
     let segmentTimeline;
     let timelineItemList;
     let segmentUrlList;

@@ -1,15 +1,12 @@
 /**
- *
+ * 
  * Basic Actions for React Componenets
- *
+ * 
  */
 
-const path = require('electron').remote.app.getAppPath()
-const isDev = require('electron-is-dev');
-
 /**
- *
- * @param {*} url
+ * 
+ * @param {*} url 
  */
 export const playStream = url => {
     playVideo(url);
@@ -21,8 +18,8 @@ export const playStream = url => {
 }
 
 /**
- *
- * @param {*} offlineUrl
+ * 
+ * @param {*} offlineUrl 
  */
 export const playOfflineStream = offlineUrl => {
     playVideo(offlineUrl);
@@ -33,40 +30,31 @@ export const playOfflineStream = offlineUrl => {
     }
 }
 
-const licenseUrl = 'https://cwip-shaka-proxy.appspot.com/no_auth';
-
 /**
- *
- * @param {*} link
+ * 
+ * @param {*} link 
  */
 function playVideo(link) {
-    const {remote} = require('electron');
+    const { BrowserWindow } = require('@electron/remote/main');
 
-    let playerWindow = new remote.BrowserWindow({
-        width: 860,
-        height: 600,
-        show: true,
-        resizable: true,
-        webPreferences: {
-            plugins: true,
-            nodeIntegration: true
-        }
+    let playerWindow = new BrowserWindow({
+      width: 860,
+      height: 600,
+      show: true,
+      resizable: true,
+      webPreferences: {
+        plugins: true,
+        nodeIntegration: true
+      }
     });
-
-    // playerWindow.loadURL(isDev ? 'http://localhost:3000/player/index.html' : "");
-    playerWindow.loadURL(`file://${path}/build/player/index.html`);
+    require("@electron/remote/main").enable(playerWindow.webContents);
+    playerWindow.loadURL('http://localhost:3000/player/index.html');
     playerWindow.webContents.openDevTools();
     playerWindow.webContents.on('did-finish-load', function (evt, args) {
-        playerWindow.webContents.send('startPlaybackStream', {
-            url: link,
-            configuration: {
-                drm: {
-                    servers: {
-                        'com.widevine.alpha': licenseUrl
-                    }
-                }
-            },
-            offlineSessionId: ''
-        });
+      playerWindow.webContents.send('startPlaybackStream', {
+        url: link,
+        configuration: {},
+        offlineSessionId: ''
+      });
     });
-}
+  }

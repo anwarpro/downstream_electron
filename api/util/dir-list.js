@@ -62,8 +62,8 @@ function dirList (dir, includeFolders, includeFiles) {
           resolve(results.filter(function (folderName) {
             return typeof folderName !== "undefined"
           }));
-        }, function (promiseError) {
-          reject(promiseError);
+        }, function (err) {
+          reject(err);
         });
       }
     });

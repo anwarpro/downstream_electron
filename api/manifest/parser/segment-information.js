@@ -62,6 +62,7 @@ const SegmentInformation = (function () {
     }
     let hasFileExtension = false;
     let initSegment = '';
+    let initNode;
     switch (this.whichUseCase) {
       case CREATE_URL.FROM_SEGMENTLIST:
         this.createFragmentFromUrlList(this.segmentUrlList);
@@ -74,8 +75,11 @@ const SegmentInformation = (function () {
         break;
 
       case CREATE_URL.FROM_TIMELINE:
-        initSegment = this.createInitSegment(this.segmentTemplate.attributes.getNamedItem("initialization").nodeValue);
-        this.mediaUrls.unshift(new MediaUrl_1.MediaUrl(this.baseUrl, initSegment, this.mimeType));
+        initNode = this.segmentTemplate.attributes.getNamedItem("initialization");
+        if (initNode) {
+          initSegment = this.createInitSegment(initNode.nodeValue);
+          this.mediaUrls.unshift(new MediaUrl_1.MediaUrl(this.baseUrl, initSegment, this.mimeType));
+        }
         this.createFragmentUrlsFromTimeline(this.timelineItemList);
         break;
 
@@ -93,8 +97,11 @@ const SegmentInformation = (function () {
 
       case CREATE_URL.FROM_TEMPLATE:
         this.createFragmentsFromTemplate();
-        initSegment = this.createInitSegment(this.segmentTemplate.attributes.getNamedItem("initialization").nodeValue);
-        this.mediaUrls.unshift(new MediaUrl_1.MediaUrl(this.baseUrl, initSegment, this.mimeType));
+        initNode = this.segmentTemplate.attributes.getNamedItem("initialization");
+        if (initNode) {
+          initSegment = this.createInitSegment(initNode.nodeValue);
+          this.mediaUrls.unshift(new MediaUrl_1.MediaUrl(this.baseUrl, initSegment, this.mimeType));
+        }
         break;
 
       default:
@@ -108,6 +115,8 @@ const SegmentInformation = (function () {
   }
 
   SegmentInformation.prototype.createFragmentUrlsFromTimeline = function (segmentNodes) {
+    const segmentTimescale = (this.segmentTemplate.attributes.getNamedItem("timescale")) ? parseInt(
+      this.segmentTemplate.attributes.getNamedItem("timescale").nodeValue) : 1;
     let currentTime = this.segmentTemplate.attributes.getNamedItem("presentationTimeOffset");
     if (currentTime) {
       currentTime = parseInt(currentTime.nodeValue, 10);
@@ -129,6 +138,10 @@ const SegmentInformation = (function () {
       const repeat = (segmentNodes[i].attributes.getNamedItem("r") && segmentNodes[i].attributes.getNamedItem(
           "r").nodeValue !== undefined) ? parseInt(segmentNodes[i].attributes.getNamedItem("r").nodeValue) : 0;
       for (let k = 1; k <= repeat; k++) {
+        // Ignore segments that start after manifest/period boundary
+        if ((currentTime / segmentTimescale) > this.presentationDuration) {
+          return;
+        } 
         let fragment_1 = this.segmentTemplate.attributes.getNamedItem("media").nodeValue;
         fragment_1 = this.replace$RepresentationID$(fragment_1, this.representationID);
         fragment_1 = this.replace$Time$(fragment_1, currentTime);
@@ -141,6 +154,12 @@ const SegmentInformation = (function () {
           currentTime = time;
         }
       }
+
+      // Ignore segments that start after manifest/period boundary
+      if ((currentTime / segmentTimescale) > this.presentationDuration) {
+        return;
+      } 
+
       let fragment = this.segmentTemplate.attributes.getNamedItem("media").nodeValue;
       fragment = this.replace$RepresentationID$(fragment, this.representationID);
       fragment = this.replace$Time$(fragment, currentTime);
