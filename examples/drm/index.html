@@ -2,7 +2,9 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <!--    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">-->
     <title>Electron API</title>
+    <script src="../../node_modules/jquery/dist/jquery.min.js"></script>
     <script src="index.js"></script>
     <style>
         #status {
@@ -65,14 +67,18 @@
 </head>
 
 <body>
-
-    <h3 id="header">Simple DRM example</h3>
-    <div id="videoOfflineWrapper">
-        <video id="videoOffline" crossOrigin="anonymous" hidden controls style="padding: 10px; width: 430px; height: 300px;">
-            Your browser does not support HTML5 video.
-        </video>
-    </div>
-    <div id="mainActions"></div>
+<h3 id="header">Simple DRM example</h3>
+We are using Node.js <span id="node-version"></span>,
+Chromium <span id="chrome-version"></span>,
+and Electron <span id="electron-version"></span>.
+<br>
+<div id="videoOfflineWrapper">
+    <video id="videoOffline" crossOrigin="anonymous" hidden controls
+           style="padding: 10px; width: 430px; height: 300px;">
+        Your browser does not support HTML5 video.
+    </video>
+</div>
+<div id="mainActions"></div>
 
 </body>
 

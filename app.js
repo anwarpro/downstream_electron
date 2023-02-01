@@ -1,7 +1,6 @@
-const {BrowserWindow, app} = require('electron');
+const {app, components, BrowserWindow,ipcMain} = require('electron');
 const fs = require('fs');
-const remote = require('@electron/remote/main');
-remote.initialize();
+const path = require('path')
 
 // TESTING PRODUCTION
 let index = './index';
@@ -12,80 +11,56 @@ if (!fs.existsSync(index)) {
 let downstreamInstance;
 const downstreamElectron = require(index);
 
-let example = 'main';
-process.argv.forEach(function (val, index, array) {
-    let params = val.split('=', 2);
-    if (!Array.isArray(params) || params.length < 2) {
-        return;
-    }
-
-    if (params[0] === 'example') {
-        example = params[1];
-    }
-});
+let example = 'drm';
 
 const exampleFile = `file://${__dirname}/examples/${example}/index.html`;
-const path = require('path');
-// default value of allowRendererProcessReuse false is deprecated
-app.allowRendererProcessReuse = true;
+
+// in the main process:
+require('@electron/remote/main').initialize()
 
 function createWindow() {
-    // eslint-disable-next-line no-process-env
-    let appDir = path.dirname(process.mainModule.filename) + '/';
-    // head request parameter test
-    let useHeadRequest = true;
 
-    // let useHeadRequest = false;
+    let appDir = path.dirname(process.mainModule.filename) + '/';
+
+    let useHeadRequest = true;
     downstreamInstance = downstreamElectron.init({
         appDir: appDir,
         numberOfManifestsInParallel: 2,
         useHeadRequests: useHeadRequest
     });
 
-    const win = new BrowserWindow({
-        width: 1200,
-        height: 728,
-        resizable: true,
+    const mainWindow = new BrowserWindow({
         webPreferences: {
-            plugins: true,
-            nodeIntegration: true,
-            // NOTE: is disabled by default since Electron 9
-            enableRemoteModule: true,
-            // NOTE: !WARNING! use with caution it allows app to download content
-            //                 from any URL
-            webSecurity: false
+            preload: path.join(__dirname, 'preload.js'),
+            nodeIntegration: true
         }
     });
 
-    win.loadURL(exampleFile);
-    remote.enable(win.webContents)
-    win.webContents.openDevTools();
+    ipcMain.on('set-title', (event, title) => {
+        const webContents = event.sender
+        const win = BrowserWindow.fromWebContents(webContents)
+        win.setTitle(title)
+    })
+
+    mainWindow.loadURL(exampleFile);
+    mainWindow.webContents.openDevTools()
+    require("@electron/remote/main").enable(mainWindow.webContents)
+    // mainWindow.loadURL('https://shaka-player-demo.appspot.com/');
 }
+
+app.whenReady().then(async () => {
+    await components.whenReady();
+    console.log('components ready:', components.status());
+    createWindow();
+});
 
 function onWillQuit() {
     downstreamInstance.stop();
 }
-
-app.on('ready', createWindow);
+//
+// app.on('ready', createWindow);
 app.on('will-quit', onWillQuit);
 app.on('window-all-closed', function () {
     console.log('window-all-closed');
     app.quit();
-});
-
-app.on('widevine-ready', (version, lastVersion) => {
-    if (null !== lastVersion) {
-        console.log('Widevine ' + version + ', upgraded from ' + lastVersion + ', is ready to be used!');
-    } else {
-        console.log('Widevine ' + version + ' is ready to be used!');
-    }
-});
-
-app.on('widevine-update-pending', (currentVersion, pendingVersion) => {
-    console.log('Widevine ' + currentVersion + ' is ready to be upgraded to ' + pendingVersion + '!');
-});
-
-app.on('widevine-error', (error) => {
-    console.log('Widevine installation encounterted an error: ' + error);
-    process.exit(1)
 });
