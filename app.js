@@ -1,4 +1,4 @@
-const {app, components, BrowserWindow,ipcMain} = require('electron');
+const {app, components, BrowserWindow, ipcMain} = require('electron');
 const fs = require('fs');
 const path = require('path')
 
@@ -26,7 +26,8 @@ function createWindow() {
     downstreamInstance = downstreamElectron.init({
         appDir: appDir,
         numberOfManifestsInParallel: 2,
-        useHeadRequests: useHeadRequest
+        useHeadRequests: useHeadRequest,
+        noCache: true,
     });
 
     const mainWindow = new BrowserWindow({
@@ -57,6 +58,7 @@ app.whenReady().then(async () => {
 function onWillQuit() {
     downstreamInstance.stop();
 }
+
 //
 // app.on('ready', createWindow);
 app.on('will-quit', onWillQuit);
